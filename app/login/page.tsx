@@ -4,14 +4,42 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login submitted:', { email, password });
-    // Example backend route call:
-    // await fetch('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+    setError('');
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+      const res = await fetch(`${apiUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // important so the HttpOnly refresh-token cookie can be set
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        setError(text || 'Login failed');
+        return;
+      }
+
+      const data = await res.json();
+      // We expect { accessToken: string } from the backend (refresh token is stored as HttpOnly cookie)
+      if (data?.accessToken) {
+        // Store access token in memory/localStorage depending on your security model
+        // For now we store in sessionStorage so it survives page reload but is cleared when the window is closed
+        sessionStorage.setItem('accessToken', data.accessToken);
+        // Redirect to home or dashboard
+        window.location.href = '/';
+      } else {
+        setError('Login failed (no token returned)');
+      }
+    } catch (err) {
+      setError('Login request failed');
+      console.error(err);
+    }
   };
 
   return (
@@ -39,14 +67,14 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} className="space-y-6">
           {/* Email */}
           <div>
-            <label className="block text-gray-300 text-sm font-semibold mb-2">Email</label>
+            <label className="block text-gray-300 text-sm font-semibold mb-2">Username</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-md bg-[#0d1118]/80 border border-gray-600 text-white focus:border-purple-400 focus:outline-none"
-              placeholder="Enter your email"
+                placeholder="Enter your username"
             />
           </div>
 

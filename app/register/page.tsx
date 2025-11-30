@@ -21,14 +21,27 @@ export default function RegisterPage() {
 
     setError('');
 
-    console.log('Register submitted:', { username, email, password });
+    setError('');
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+      const res = await fetch(`${apiUrl}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-    // Example backend route call
-    // await fetch('/api/register', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ username, email, password }),
-    // });
+      if (!res.ok) {
+        const text = await res.text();
+        setError(text || 'Registration failed');
+        return;
+      }
+
+      // Successful registration — redirect to login
+      window.location.href = '/login';
+    } catch (err) {
+      setError('Registration request failed');
+      console.error(err);
+    }
   };
 
   return (
