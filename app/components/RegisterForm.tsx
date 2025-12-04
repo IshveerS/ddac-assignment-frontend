@@ -1,26 +1,22 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
 
-// Dynamically import RegisterForm to ensure it's in client context with provider
-const RegisterForm = dynamic(() => import('../components/RegisterForm').then(mod => ({ default: mod.RegisterForm })), {
-  ssr: false,
-  loading: () => <div className="min-h-screen flex items-center justify-center bg-[#0a0d12]">Loading...</div>,
-});
+export function RegisterForm() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
-export default function RegisterPage() {
-  return <RegisterForm />;
-}
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ Simple password match validation
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
-
-    setError('');
 
     setError('');
     try {
@@ -37,7 +33,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Successful registration — redirect to login
       window.location.href = '/login';
     } catch (err) {
       setError('Registration request failed');
@@ -77,7 +72,7 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-md bg-[#0d1118]/80 border border-gray-600 text-white focus:border-purple-400 focus:outline-none"
-              placeholder="Enter your username"
+              placeholder="Choose your username"
             />
           </div>
 
@@ -103,7 +98,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-md bg-[#0d1118]/80 border border-gray-600 text-white focus:border-purple-400 focus:outline-none"
-              placeholder="Create a password"
+              placeholder="Enter your password"
             />
           </div>
 
@@ -116,12 +111,16 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-md bg-[#0d1118]/80 border border-gray-600 text-white focus:border-purple-400 focus:outline-none"
-              placeholder="Re-enter your password"
+              placeholder="Confirm your password"
             />
           </div>
 
-          {/* Error Message */}
-          {error && <p className="text-red-400 text-sm font-semibold text-center">{error}</p>}
+          {/* Error message */}
+          {error && (
+            <div className="text-red-400 text-sm text-center">
+              {error}
+            </div>
+          )}
 
           {/* Register Button */}
           <button
@@ -136,17 +135,17 @@ export default function RegisterPage() {
         <p className="text-center text-sm text-gray-400 mt-6">
           Already have an account?{' '}
           <Link href="/login" className="text-purple-400 hover:text-purple-300 font-semibold">
-            Login here
+            Sign in here
           </Link>
         </p>
 
-        {/* ✅ Add this new section */}
+        {/* Home button */}
         <div className="text-center mt-6">
           <Link
             href="/"
             className="inline-block text-purple-400 hover:text-purple-300 font-semibold border border-purple-400 px-5 py-2 rounded-md hover:bg-purple-500/20 transition-all"
           >
-            Home 🏠︎
+            Home 🏠
           </Link>
         </div>
       </div>

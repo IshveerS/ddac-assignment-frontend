@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from './AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { Menu, X, LogIn, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';

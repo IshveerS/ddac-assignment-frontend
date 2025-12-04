@@ -1,18 +1,19 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { NavBar } from './components/NavBar';
+import dynamic from 'next/dynamic';
+
+// Dynamically import NavBar with no SSR to avoid provider issues
+const NavBar = dynamic(() => import('./components/NavBar').then(mod => mod.NavBar), {
+  ssr: false,
+  loading: () => null, // Don't show anything while loading
+});
 
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState('Home');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
 
