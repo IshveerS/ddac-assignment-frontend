@@ -2,12 +2,19 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { Menu, X, LogIn } from 'lucide-react';
+import { Menu, X, LogIn, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from './context/AuthContext';
 
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState('Home');
+  const { isAuthenticated, clearAuth } = useAuth();
+
+  const handleLogout = () => {
+    clearAuth();
+    window.location.href = '/login';
+  };
 
   const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
 
@@ -111,15 +118,25 @@ export default function HomePage() {
             })}
           </nav>
 
-          {/* Sign In button */}
+          {/* Sign In / Logout button */}
           <div className="hidden md:flex items-center space-x-2">
-            <Link
-              href="/login"
-              className="flex items-center text-purple-400 border border-purple-400 px-4 py-2 rounded-md font-semibold hover:bg-purple-400 hover:text-black transition"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center text-red-400 border border-red-400 px-4 py-2 rounded-md font-semibold hover:bg-red-400 hover:text-black transition"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center text-purple-400 border border-purple-400 px-4 py-2 rounded-md font-semibold hover:bg-purple-400 hover:text-black transition"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Sign In
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}

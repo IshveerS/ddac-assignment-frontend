@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { setAccessToken } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +31,8 @@ export default function LoginPage() {
       const data = await res.json();
       // We expect { accessToken: string } from the backend (refresh token is stored as HttpOnly cookie)
       if (data?.accessToken) {
-        // Store access token in memory/localStorage depending on your security model
-        // For now we store in sessionStorage so it survives page reload but is cleared when the window is closed
-        sessionStorage.setItem('accessToken', data.accessToken);
+        // Store access token in Auth context (which saves to localStorage)
+        setAccessToken(data.accessToken);
         // Redirect to home or dashboard
         window.location.href = '/';
       } else {
