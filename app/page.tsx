@@ -1,20 +1,18 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import { Menu, X, LogIn, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useAuth } from './context/AuthContext';
+import { NavBar } from './components/NavBar';
 
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState('Home');
-  const { isAuthenticated, clearAuth } = useAuth();
+  const [mounted, setMounted] = useState(false);
 
-  const handleLogout = () => {
-    clearAuth();
-    window.location.href = '/login';
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
 
@@ -67,118 +65,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0a0d12] text-white font-sans overflow-hidden relative">
       {/* ===== Navbar ===== */}
-      <header className="fixed top-0 left-0 w-full bg-[#0a0d12]/90 backdrop-blur-md border-b border-emerald-500/30 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center h-16 px-6">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="relative w-10 h-10 md:w-12 md:h-12">
-              <Image
-                src="/lol_logo.jpg"
-                alt="LegendForge Logo"
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 40px, 60px"
-                priority
-              />
-            </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">
-              <span className="text-purple-400">Legend</span>
-              <span className="text-white">Forge</span>
-            </h1>
-          </div>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold">
-            {navItems.map((item) => {
-              // Automatically generate route
-              const path =
-                item === 'Home'
-                  ? '/'
-                  : item === 'Contact'
-                  ? '/contactus'
-                  : `/${item.toLowerCase().replace(/\s+/g, '')}`;
-
-              return (
-                <Link
-                  key={item}
-                  href={path}
-                  onClick={() => setActive(item)}
-                  className={`relative transition-all group ${
-                    active === item ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
-                  }`}
-                >
-                  {item}
-                  <span
-                    className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-400 transition-all ${
-                      active === item ? 'w-full' : 'w-0 group-hover:w-full'
-                    }`}
-                  ></span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Sign In / Logout button */}
-          <div className="hidden md:flex items-center space-x-2">
-            {isAuthenticated ? (
-              <button
-                onClick={handleLogout}
-                className="flex items-center text-red-400 border border-red-400 px-4 py-2 rounded-md font-semibold hover:bg-red-400 hover:text-black transition"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center text-purple-400 border border-purple-400 px-4 py-2 rounded-md font-semibold hover:bg-purple-400 hover:text-black transition"
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                Sign In
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden text-gray-300 hover:text-emerald-400"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="md:hidden bg-[#0d1118] border-t border-emerald-500/30 px-6 py-4 space-y-3">
-            {navItems.map((item) => {
-              const path =
-                item === 'Home'
-                  ? '/'
-                  : item === 'Contact'
-                  ? '/contactus'
-                  : `/${item.toLowerCase().replace(/\s+/g, '')}`;
-
-              return (
-                <Link
-                  key={item}
-                  href={path}
-                  onClick={() => setActive(item)}
-                  className={`block font-semibold ${
-                    active === item ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
-                  }`}
-                >
-                  {item}
-                </Link>
-              );
-            })}
-            <button className="w-full mt-2 flex items-center justify-center text-purple-400 border border-purple-400 px-4 py-2 rounded-md font-semibold hover:bg-purple-400 hover:text-black transition">
-              <LogIn className="w-4 h-4 mr-2" />
-              Sign In
-            </button>
-          </div>
-        )}
-      </header>
+      <NavBar navItems={navItems} />
 
       {/* ===== Hero Section ===== */}
       <section className="relative flex items-center justify-center w-full min-h-screen px-6 pt-32 pb-16 overflow-hidden text-center">
