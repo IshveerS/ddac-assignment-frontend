@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
@@ -12,9 +11,6 @@ const NavBar = dynamic(() => import('./components/NavBar').then(mod => mod.NavBa
 });
 
 export default function HomePage() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [active, setActive] = useState('Home');
-
   const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
 
   // 📰 Latest News Data
@@ -64,8 +60,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0d12] text-white font-sans overflow-hidden relative">
-      {/* ===== Navbar ===== */}
+    <div className="min-h-screen bg-[#0a0d12] text-white font-sans overflow-hidden relative">      {/* ===== Navbar ===== */}
       <NavBar navItems={navItems} />
 
       {/* ===== Hero Section ===== */}

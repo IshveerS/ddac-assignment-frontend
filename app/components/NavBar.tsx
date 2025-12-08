@@ -3,12 +3,26 @@
 import { useAuth } from '../context/AuthContext';
 import { Menu, X, LogIn, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export function NavBar({ navItems }: { navItems: string[] }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [active, setActive] = useState('Home');
-  const { isAuthenticated, clearAuth } = useAuth();
+  const pathname = usePathname();
+  const { isAuthenticated, clearAuth, role, isAdmin, isOrganizer } = useAuth();
+
+  const resolvePath = (item: string) => {
+    if (item === 'Home') return '/';
+    if (item === 'Contact') return '/contactus';
+    return `/${item.toLowerCase().replace(/\s+/g, '')}`;
+  };
+
+  const isActive = (item: string) => {
+    const path = resolvePath(item);
+    if (path === '/') return pathname === '/';
+    return pathname === path || pathname.startsWith(`${path}/`);
+  };
 
   const handleLogout = () => {
     clearAuth();
@@ -21,10 +35,12 @@ export function NavBar({ navItems }: { navItems: string[] }) {
         {/* Logo */}
         <div className="flex items-center space-x-3">
           <div className="relative w-10 h-10 md:w-12 md:h-12">
-            <img
+            <Image
               src="/lol_logo.jpg"
               alt="LegendForge Logo"
-              className="w-full h-full object-contain"
+              fill
+              className="object-contain"
+              sizes="48px"
             />
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight">
@@ -36,43 +52,106 @@ export function NavBar({ navItems }: { navItems: string[] }) {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold">
           {navItems.map((item) => {
-            const path =
-              item === 'Home'
-                ? '/'
-                : item === 'Contact'
-                ? '/contactus'
-                : `/${item.toLowerCase().replace(/\s+/g, '')}`;
-
+            const path = resolvePath(item);
+            const active = isActive(item);
             return (
               <Link
                 key={item}
                 href={path}
-                onClick={() => setActive(item)}
                 className={`relative transition-all group ${
-                  active === item ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
+                  active ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
                 }`}
               >
                 {item}
                 <span
                   className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-400 transition-all ${
-                    active === item ? 'w-full' : 'w-0 group-hover:w-full'
+                    active ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}
                 ></span>
               </Link>
             );
           })}
+          {isAuthenticated && (
+            <>
+              <Link
+                href="/profile"
+                className={`relative transition-all group ${
+                  pathname === '/profile' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
+                }`}
+              >
+                Profile
+                <span
+                  className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-400 transition-all ${
+                    pathname === '/profile' ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}
+                ></span>
+              </Link>
+            </>
+          )}
+          {(isAdmin || isOrganizer) && (
+            <Link
+              href="/console"
+              className={`relative transition-all group ${
+                pathname === '/console' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
+              }`}
+            >
+              Console
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-400 transition-all ${
+                  pathname === '/console' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}
+              ></span>
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`relative transition-all group ${
+                pathname === '/admin' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
+              }`}
+            >
+              Admin
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-400 transition-all ${
+                  pathname === '/admin' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}
+              ></span>
+            </Link>
+          )}
+          {isOrganizer && (
+            <Link
+              href="/organizer"
+              className={`relative transition-all group ${
+                pathname === '/organizer' ? 'text-emerald-400' : 'text-gray-300 hover:text-emerald-400'
+              }`}
+            >
+              Organizer
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 bg-emerald-400 transition-all ${
+                  pathname === '/organizer' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}
+              ></span>
+            </Link>
+          )}
         </nav>
 
         {/* Sign In / Logout button */}
         <div className="hidden md:flex items-center space-x-2">
           {isAuthenticated ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center text-red-400 border border-red-400 px-4 py-2 rounded-md font-semibold hover:bg-red-400 hover:text-black transition"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </button>
+            <>
+              {role && (
+                <span className="text-xs uppercase tracking-wide text-emerald-300 border border-emerald-400/50 px-2 py-1 rounded-full">
+                  {role}
+                </span>
+              )}
+              <button
+                onClick={handleLogout}
+                className="flex items-center text-red-400 border border-red-400 px-4 py-2 rounded-md font-semibold hover:bg-red-400 hover:text-black transition"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </button>
+            </>
           ) : (
             <Link
               href="/login"
@@ -97,24 +176,56 @@ export function NavBar({ navItems }: { navItems: string[] }) {
       {isOpen && (
         <div className="md:hidden bg-[#0d1118] border-t border-emerald-500/30 px-6 py-4 space-y-3">
           {navItems.map((item) => {
-            const path =
-              item === 'Home'
-                ? '/'
-                : item === 'Contact'
-                ? '/contactus'
-                : `/${item.toLowerCase().replace(/\s+/g, '')}`;
-
+            const path = resolvePath(item);
             return (
               <Link
                 key={item}
                 href={path}
-                onClick={() => setActive(item)}
+                onClick={() => setIsOpen(false)}
                 className="block text-gray-300 hover:text-emerald-400 transition"
               >
                 {item}
               </Link>
             );
           })}
+          {isAuthenticated && (
+            <>
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className="block text-gray-300 hover:text-emerald-400 transition"
+              >
+                Profile
+              </Link>
+            </>
+          )}
+          {(isAdmin || isOrganizer) && (
+            <Link
+              href="/console"
+              onClick={() => setIsOpen(false)}
+              className="block text-gray-300 hover:text-emerald-400 transition"
+            >
+              Console
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="block text-gray-300 hover:text-emerald-400 transition"
+            >
+              Admin Dashboard
+            </Link>
+          )}
+          {isOrganizer && (
+            <Link
+              href="/organizer"
+              onClick={() => setIsOpen(false)}
+              className="block text-gray-300 hover:text-emerald-400 transition"
+            >
+              Organizer Dashboard
+            </Link>
+          )}
           {isAuthenticated ? (
             <button
               onClick={handleLogout}

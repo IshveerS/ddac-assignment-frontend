@@ -8,10 +8,21 @@ export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { setAccessToken } = useAuth();
+  const { setSession } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validation
+    if (!username.trim()) {
+      setError('Username is required');
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+    
     setError('');
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -30,7 +41,8 @@ export function LoginForm() {
 
       const data = await res.json();
       if (data?.accessToken) {
-        setAccessToken(data.accessToken);
+        const role = data?.role ?? null;
+        setSession(data.accessToken, role);
         window.location.href = '/';
       } else {
         setError('Login failed (no token returned)');
@@ -108,7 +120,7 @@ export function LoginForm() {
 
         {/* Footer Link */}
         <p className="text-center text-sm text-gray-400 mt-6">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="text-purple-400 hover:text-purple-300 font-semibold">
             Register here
           </Link>
@@ -120,7 +132,7 @@ export function LoginForm() {
             href="/"
             className="inline-block text-purple-400 hover:text-purple-300 font-semibold border border-purple-400 px-5 py-2 rounded-md hover:bg-purple-500/20 transition-all"
           >
-            Home 🏠
+            Home
           </Link>
         </div>
       </div>

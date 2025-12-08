@@ -1,43 +1,67 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, FC } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
   accessToken: string | null;
+  role: string | null;
   isAuthenticated: boolean;
-  setAccessToken: (token: string) => void;
+  isAdmin: boolean;
+  isOrganizer: boolean;
+  setSession: (token: string, role: string | null) => void;
   clearAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [accessToken, setAccessTokenState] = useState<string | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [accessToken, setAccessTokenState] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('accessToken');
+  });
+  const [role, setRoleState] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('role');
+  });
 
-  // Load token from localStorage on mount (client-side only)
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+  const setSession = (token: string, newRole: string | null) => {
     setAccessTokenState(token);
-    setIsHydrated(true);
-  }, []);
-
-  const setAccessToken = (token: string) => {
-    setAccessTokenState(token);
-    localStorage.setItem('accessToken', token);
+    setRoleState(newRole);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', token);
+      if (newRole) {
+        localStorage.setItem('role', newRole);
+      } else {
+        localStorage.removeItem('role');
+      }
+    }
   };
 
   const clearAuth = () => {
     setAccessTokenState(null);
-    localStorage.removeItem('accessToken');
+    setRoleState(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('role');
+    }
   };
 
-  if (!isHydrated) {
-    return <>{children}</>; // Avoid hydration mismatch
-  }
+  const normalizedRole = role?.toLowerCase() ?? null;
+  const isAdmin = normalizedRole === 'admin';
+  const isOrganizer = normalizedRole === 'organizer';
 
   return (
-    <AuthContext.Provider value={{ accessToken, isAuthenticated: !!accessToken, setAccessToken, clearAuth }}>
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        role: normalizedRole,
+        isAuthenticated: !!accessToken,
+        isAdmin,
+        isOrganizer,
+        setSession,
+        clearAuth,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
