@@ -24,6 +24,14 @@ interface Tournament {
   status: string;
 }
 
+interface TeamMember {
+  fullName: string;
+  age: string;
+  email: string;
+  contactNumber: string;
+  role: string;
+}
+
 export default function TournamentPage() {
   const router = useRouter();
   const [successMessage, setSuccessMessage] = useState('');
@@ -32,6 +40,9 @@ export default function TournamentPage() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [teamName, setTeamName] = useState('');
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+    { fullName: '', age: '', email: '', contactNumber: '', role: '' },
+  ]);
   const [registering, setRegistering] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -73,6 +84,19 @@ export default function TournamentPage() {
       return;
     }
 
+    const sanitizedMembers = teamMembers.map((member) => ({
+      fullName: member.fullName.trim(),
+      age: member.age.trim(),
+      email: member.email.trim(),
+      contactNumber: member.contactNumber.trim(),
+      role: member.role.trim(),
+    }));
+
+    if (sanitizedMembers.some((m) => !m.fullName || !m.age || !m.email || !m.contactNumber || !m.role)) {
+      toast.warning('Please complete all player fields');
+      return;
+    }
+
     setRegistering(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -83,7 +107,13 @@ export default function TournamentPage() {
           'Authorization': `Bearer ${accessToken}`,
         },
         credentials: 'include',
-        body: JSON.stringify({ teamName }),
+        body: JSON.stringify({
+          teamName,
+          members: sanitizedMembers.map((m) => ({
+            ...m,
+            age: Number(m.age) || m.age,
+          })),
+        }),
       });
 
       if (!res.ok) {
@@ -93,6 +123,7 @@ export default function TournamentPage() {
 
       setShowRegisterModal(false);
       setTeamName('');
+      setTeamMembers([{ fullName: '', age: '', email: '', contactNumber: '', role: '' }]);
       toast.success(`Successfully registered for ${selectedTournament?.name}!`);
     } catch (err: any) {
       toast.error(err.message || 'Failed to register');
@@ -259,13 +290,90 @@ export default function TournamentPage() {
 
             <input
               type="text"
-              placeholder="Enter your team name"
+              placeholder="Team name"
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white mb-6 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white mb-4 focus:outline-none focus:border-purple-500"
             />
 
-            <div className="flex gap-4">
+            <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1">
+              {teamMembers.map((member, idx) => (
+                <div key={idx} className="rounded-lg border border-gray-700 p-4 bg-gray-900/60 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-semibold text-purple-300">Player {idx + 1}</p>
+                    {teamMembers.length > 1 && (
+                      <button
+                        type="button"
+                        className="text-xs text-red-300 hover:text-red-200"
+                        onClick={() => setTeamMembers((prev) => prev.filter((_, i) => i !== idx))}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Full name"
+                      value={member.fullName}
+                      onChange={(e) => setTeamMembers((prev) => prev.map((m, i) => i === idx ? { ...m, fullName: e.target.value } : m))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Age"
+                      min={10}
+                      value={member.age}
+                      onChange={(e) => setTeamMembers((prev) => prev.map((m, i) => i === idx ? { ...m, age: e.target.value } : m))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={member.email}
+                      onChange={(e) => setTeamMembers((prev) => prev.map((m, i) => i === idx ? { ...m, email: e.target.value } : m))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Contact number"
+                      value={member.contactNumber}
+                      onChange={(e) => setTeamMembers((prev) => prev.map((m, i) => i === idx ? { ...m, contactNumber: e.target.value } : m))}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  <select
+                    value={member.role}
+                    onChange={(e) => setTeamMembers((prev) => prev.map((m, i) => i === idx ? { ...m, role: e.target.value } : m))}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                  >
+                    <option value="">Select role</option>
+                    <option value="Jungle">Jungle</option>
+                    <option value="Middle">Middle</option>
+                    <option value="Marksman">Marksman</option>
+                    <option value="Supporter">Supporter</option>
+                    <option value="Top">Top</option>
+                  </select>
+                </div>
+              ))}
+
+              {teamMembers.length < 7 && (
+                <button
+                  type="button"
+                  onClick={() => setTeamMembers((prev) => [...prev, { fullName: '', age: '', email: '', contactNumber: '', role: '' }])}
+                  className="w-full py-2 rounded-md border border-dashed border-purple-400 text-purple-300 hover:bg-purple-400/10 transition"
+                >
+                  + Add player
+                </button>
+              )}
+            </div>
+
+            <div className="mt-6 flex gap-4">
               <button
                 onClick={handleRegister}
                 disabled={registering}
@@ -277,6 +385,7 @@ export default function TournamentPage() {
                 onClick={() => {
                   setShowRegisterModal(false);
                   setTeamName('');
+                  setTeamMembers([{ fullName: '', age: '', email: '', contactNumber: '', role: '' }]);
                 }}
                 className="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 rounded-md transition"
               >
