@@ -40,6 +40,30 @@ export default function PastResultsPage() {
       img: '/lol_join2.jpg',
       description: 'New players showcased impressive potential in this thrilling opener.',
     },
+    {
+      id: 4,
+      title: 'Spring Split Playoffs 2024',
+      winner: 'Crimson Vanguard',
+      date: 'December 18, 2024',
+      img: '/lol_join2.jpg',
+      description: 'A thrilling playoff battle with unexpected upsets and incredible plays.',
+    },
+    {
+      id: 5,
+      title: 'Winter Warriors Tournament',
+      winner: 'Frost Legends',
+      date: 'December 1, 2024',
+      img: '/lol_join2.jpg',
+      description: 'Winter championship showcasing exceptional team coordination and strategy.',
+    },
+    {
+      id: 6,
+      title: 'Autumn Tournament Series',
+      winner: 'Phoenix Rising',
+      date: 'November 10, 2024',
+      img: '/lol_join2.jpg',
+      description: 'An epic series spanning three weekends with memorable matches.',
+    },
   ];
 
   return (
