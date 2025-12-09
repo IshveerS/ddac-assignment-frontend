@@ -16,7 +16,7 @@ export default function FAQPage() {
   const [expanded, setExpanded] = useState<number | null>(null);
   const { isAdmin, isOrganizer } = useAuth();
 
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
 
   const roles = [
     {

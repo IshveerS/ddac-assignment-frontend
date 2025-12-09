@@ -39,7 +39,7 @@ const cards = {
 
 export default function ConsolePage() {
   const { isAuthenticated, isAdmin, isOrganizer, role } = useAuth();
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
   const authedFetch = useAuthenticatedFetch();
 
   const [accountId, setAccountId] = useState('');

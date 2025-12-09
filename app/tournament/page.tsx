@@ -38,7 +38,7 @@ export default function TournamentPage() {
   const { isAuthenticated, accessToken } = useAuth();
   const toast = useToast();
 
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
 
   useEffect(() => {
     fetchTournaments();

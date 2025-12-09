@@ -11,7 +11,7 @@ const NavBar = dynamic(() => import('../../components/NavBar').then((mod) => mod
 
 export default function DevSessionPage() {
   const { setSession, clearAuth, role, accessToken, isAuthenticated } = useAuth();
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
   const [accountId, setAccountId] = useState('');
   const [accountStatus, setAccountStatus] = useState<'idle' | 'ok' | 'error'>('idle');
   const [tournamentName, setTournamentName] = useState('');

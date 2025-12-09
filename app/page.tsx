@@ -11,7 +11,7 @@ const NavBar = dynamic(() => import('./components/NavBar').then(mod => mod.NavBa
 });
 
 export default function HomePage() {
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
 
   // 📰 Latest News Data
   const news = [

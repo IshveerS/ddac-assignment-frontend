@@ -11,7 +11,7 @@ const NavBar = dynamic(() => import('../components/NavBar').then((mod) => mod.Na
 });
 
 export default function ContactUs() {
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
 
   return (
     <div className="min-h-screen bg-[#0a0d12] text-white font-sans overflow-hidden relative">

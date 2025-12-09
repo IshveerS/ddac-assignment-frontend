@@ -28,7 +28,7 @@ export default function ProfilePage() {
   const { accessToken, isAuthenticated, clearAuth, role, isAdmin, isOrganizer } = useAuth();
   const toast = useToast();
   
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState<string>('');

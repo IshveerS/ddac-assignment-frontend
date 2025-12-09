@@ -324,7 +324,7 @@ function TournamentRegistrationsSection() {
 
 export default function AdminPage() {
   const router = useRouter();
-  const navItems = ['Home', 'Tournament', 'Contact', 'About Us', 'FAQ'];
+  const navItems = ['Home', 'Tournament', 'PastResult', 'Contact', 'About Us', 'FAQ'];
   
   return (
     <RoleGate allowed={['admin']}>
